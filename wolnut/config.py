@@ -1,5 +1,7 @@
+import os
 from typing import Dict, List, Optional
-from pydantic import BaseModel, Field, field_validator, model_validator
+import yaml
+from pydantic import BaseModel, Field, model_validator
 
 
 class NutSource(BaseModel):
@@ -18,11 +20,11 @@ class ClientConfig(BaseModel):
     name: str
     host: str
     mac: str
-    ups: str  # Must match a key in the 'nut' dict
+    ups: str  # Must map to a key inside the `nut` dictionary
 
 
 class WolNutConfig(BaseModel):
-    nut: Dict[str, NutSource] = Field(..., min_items=1)
+    nut: Dict[str, NutSource] = Field(..., min_length=1)
     master_ups: Optional[str] = None
     status_file: str = "/config/wolnut_state.json"
     wake_on: WakeOnConfig = Field(default_factory=WakeOnConfig)
@@ -30,10 +32,10 @@ class WolNutConfig(BaseModel):
 
     @model_validator(mode="after")
     def validate_ups_references(self) -> "WolNutConfig":
-        # 1. Validate master_ups if it is set
+        # 1. Validate master_ups exists if defined
         if self.master_ups and self.master_ups not in self.nut:
             raise ValueError(
-                f"master_ups '{self.master_ups}' is not defined in the 'nut' configuration section."
+                f"master_ups '{self.master_ups}' is not defined in the 'nut' configuration block."
             )
 
         # 2. Validate that each client's assigned UPS exists
@@ -41,7 +43,18 @@ class WolNutConfig(BaseModel):
             if client.ups not in self.nut:
                 raise ValueError(
                     f"Client '{client.name}' references UPS '{client.ups}', "
-                    f"which does not exist in the 'nut' configuration section."
+                    f"which does not exist in the 'nut' configuration block."
                 )
 
         return self
+
+
+def load_config(config_path: str = "/config/config.yaml") -> WolNutConfig:
+    """Loads and validates the YAML configuration file."""
+    if not os.path.exists(config_path):
+        raise FileNotFoundError(f"Configuration file not found at: {config_path}")
+        
+    with open(config_path, "r") as f:
+        raw_yaml = yaml.safe_load(f) or {}
+        
+    return WolNutConfig.model_validate(raw_yaml)
