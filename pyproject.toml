@@ -5,6 +5,7 @@ readme = "README.md"
 authors = [{ name = "hardwarehaven", email = "hardwarehaven.media@gmail.com" }]
 license = "MIT"
 requires-python = ">=3.11"
+version = "0.2.0"
 dependencies = [
     "pydantic>=2.0.0",
     "pyyaml>=6.0",
