@@ -6,8 +6,8 @@ authors = [{ name = "hardwarehaven", email = "hardwarehaven.media@gmail.com" }]
 license = "MIT"
 requires-python = ">=3.11"
 dependencies = [
-    "click>=8.2.1",
-    "pyyaml>=6.0.2",
+    "pydantic>=2.0.0",
+    "pyyaml>=6.0",
     "wakeonlan>=3.1.0",
 ]
 dynamic = ["version"]
@@ -19,7 +19,7 @@ path = "wolnut/__init__.py"
 default-groups = []
 
 [project.scripts]
-wolnut = "wolnut.cli:wolnut"
+wolnut = "wolnut.main:main"
 
 [build-system]
 requires = ["hatchling"]
