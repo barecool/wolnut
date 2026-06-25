@@ -1,4 +1,5 @@
-__version__ = "1.0.0"
-from wolnut.cli import main  # re-export
+"""
+WolNut - A clean utility parsing cross-platform UPS structures to command machine Wake-on-LAN states.
+"""
 
-__all__ = ("main",)
+__version__ = "0.2.0"
